@@ -1,0 +1,32 @@
+name: Build WireGuard Android APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取源码
+        uses: actions/checkout@v4
+        with:
+          repository: WireGuard/wireguard-android
+          ref: 1.0.20260102  # 对应最新版本号
+
+      - name: 安装依赖
+        run: |
+          sudo apt update
+          sudo apt install -y openjdk-11-jdk wget unzip
+          wget https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+          unzip gradle-9.2.1-bin.zip
+          export PATH=$PWD/gradle-9.2.1/bin:$PATH
+
+      - name: 编译APK
+        run: |
+          cd wireguard-android
+          gradle assembleRelease
+
+      - name: 上传编译产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: wireguard-android-apk
+          path: wireguard-android/app/build/outputs/apk/release/*.apk
+
