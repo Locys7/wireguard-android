@@ -1,29 +1,20 @@
-name: Build WireGuard Android
+name: Build
 on: [workflow_dispatch]
-
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: WireGuard/wireguard-android
-          submodules: 'recursive'  # 关键：拉取子模块
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+          submodules: true
+      - uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Build APK
-        run: |
-          ./gradlew assembleRelease --no-daemon
-        working-directory: ./wireguard-android
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+          java-version: 17
+          distribution: temurin
+      - run: ./gradlew assembleRelease
+        working-directory: .
+      - uses: actions/upload-artifact@v4
         with:
-          name: wireguard-apk
-          path: wireguard-android/app/build/outputs/apk/release/*.apk
+          name: wireguard-android
+          path: app/build/outputs/apk/release/*.apk
